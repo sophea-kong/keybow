@@ -1,0 +1,130 @@
+<?xml version="1.0" ?>
+<robot name="iss">
+  <link name="base"/>
+  <link name="iss_body">
+    <inertial>
+      <mass value="183353"/>
+      <origin rpy="0 0 0" xyz="-6.03 0.31 3.59"/>
+      <inertia ixx="10276978" ixy="-1084837" ixz="597098" iyy="31940398" iyz="-614081" izz="40019058"/>
+    </inertial>
+    <visual name="jpm">
+      <geometry>
+        <mesh filename="package://description/media/meshes/iss/jpm.dae" scale="1.0858 1.0858 1.0858"/>
+      </geometry>
+      <origin rpy="3.1415 0 -3.1415" xyz="10.9358938 -2.3364698 4.8505872"/>
+    </visual>
+    <collision name="jpm">
+      <geometry>
+        <mesh filename="package://description/media/meshes/iss/jpm.dae" scale="1.0858 1.0858 1.0858"/>
+      </geometry>
+      <origin rpy="3.1415 0 -3.1415" xyz="10.9358938 -2.3364698 4.8505872"/>
+    </collision>
+    <visual name="kibo_origin_marker">
+      <geometry>
+        <sphere radius="0.08"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="10.9358938 -2.3364698 4.8505872"/>
+      <material name="kibo_origin_red">
+        <color rgba="1.0 0.0 0.0 1.0"/>
+      </material>
+    </visual>
+    <visual name="ARmarker1">
+      <origin rpy="3.141593 -1.570796 3.141593" xyz="11.936894 -4.927560 4.962621"/>
+      <geometry>
+        <mesh filename="package://krpc_description/description/media/ib2_iss/meshes/ARmarker1.dae"/>
+      </geometry>
+    </visual>
+    <visual name="ARmarker2">
+      <origin rpy="3.141593 -1.570796 3.141593" xyz="11.936894 -6.449560 4.925621"/>
+      <geometry>
+        <mesh filename="package://krpc_description/description/media/ib2_iss/meshes/ARmarker2.dae"/>
+      </geometry>
+    </visual>
+    <visual name="ARmarker3">
+      <origin rpy="3.141593 -1.570796 3.141593" xyz="11.936894 -6.789560 5.120621"/>
+      <geometry>
+        <mesh filename="package://krpc_description/description/media/ib2_iss/meshes/ARmarker3.dae"/>
+      </geometry>
+    </visual>
+    <visual name="ARmarker4">
+      <origin rpy="3.141593 -1.570796 3.141593" xyz="11.936894 -7.657560 5.120621"/>
+      <geometry>
+        <mesh filename="package://krpc_description/description/media/ib2_iss/meshes/ARmarker4.dae"/>
+      </geometry>
+    </visual>
+    <visual name="ARmarker5">
+      <origin rpy="3.141593 -1.570796 3.141593" xyz="11.936894 -9.230560 4.805621"/>
+      <geometry>
+        <mesh filename="package://krpc_description/description/media/ib2_iss/meshes/ARmarker5.dae"/>
+      </geometry>
+    </visual>
+    <visual name="ARmarker6">
+      <origin rpy="3.141593 -0.000000 3.141593" xyz="11.217894 -5.371560 5.851621"/>
+      <geometry>
+        <mesh filename="package://krpc_description/description/media/ib2_iss/meshes/ARmarker6.dae"/>
+      </geometry>
+    </visual>
+    <visual name="ARmarker7">
+      <origin rpy="3.141593 -1.570796 3.141593" xyz="11.936894 -4.927560 5.271621"/>
+      <geometry>
+        <mesh filename="package://krpc_description/description/media/ib2_iss/meshes/ARmarker7.dae"/>
+      </geometry>
+    </visual>
+    <visual name="ARmarker8">
+      <origin rpy="0.000000 0.000000 1.570796" xyz="10.823894 -8.255560 3.759621"/>
+      <geometry>
+        <mesh filename="package://krpc_description/description/media/ib2_iss/meshes/ARmarker8.dae"/>
+      </geometry>
+    </visual>
+    <visual name="ARmarker9">
+      <origin rpy="3.141593 1.570796 3.141593" xyz="9.889894 -5.542560 5.657621"/>
+      <geometry>
+        <mesh filename="package://krpc_description/description/media/ib2_iss/meshes/ARmarker9.dae"/>
+      </geometry>
+    </visual>
+    <visual name="ARmarker10">
+      <origin rpy="0.000000 0.000000 1.570796" xyz="10.925894 -9.327560 3.759621"/>
+      <geometry>
+        <mesh filename="package://krpc_description/description/media/ib2_iss/meshes/ARmarker10.dae"/>
+      </geometry>
+    </visual>
+    <visual name="ARmarker11">
+      <origin rpy="-1.570796 0.000000 0.000000" xyz="10.572894 -10.671560 4.413621"/>
+      <geometry>
+        <mesh filename="package://krpc_description/description/media/ib2_iss/meshes/ARmarker11.dae"/>
+      </geometry>
+    </visual>
+    <visual name="ARmarker12">
+      <origin rpy="1.570796 0.000000 0.000000" xyz="10.994894 -3.476560 5.745621"/>
+      <geometry>
+        <mesh filename="package://krpc_description/description/media/ib2_iss/meshes/ARmarker12.dae"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="iss_joint" type="fixed">
+    <parent link="base"/>
+    <child link="iss_body"/>
+  </joint>
+  <link name="dock_body">
+    <visual name="docking_station">
+      <geometry>
+        <mesh filename="package://description/media/meshes/iss/docking_station.dae"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </visual>
+    <collision name="docking_station">
+      <geometry>
+        <mesh filename="package://description/media/meshes/iss/docking_station.dae"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </collision>
+  </link>
+  <joint name="dock_joint" type="fixed">
+    <parent link="iss_body"/>
+    <child link="dock_body"/>
+    <origin rpy="3.1415926535898 0 -1.5707963267949" xyz="10.9358938 -3.4765598 5.6432212"/>
+  </joint>
+  <gazebo>
+    <plugin filename="libissdyn.so" name="issdyn"/>
+  </gazebo>
+</robot>

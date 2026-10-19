@@ -1,0 +1,9 @@
+*.pcd
+build/
+devel/
+share/
+reports/
+__pycache__/
+.pytest_cache/
+src_local_backup/
+ff_msgs

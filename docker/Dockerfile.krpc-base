@@ -1,0 +1,240 @@
+ARG BASE_TAG=bionic
+FROM dorowu/ubuntu-desktop-lxde-vnc:${BASE_TAG} as system
+
+################################################################################
+# Base
+################################################################################
+# ENV USER melodic
+# ENV PASS $USER
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update \
+    && apt-get install -q -y --no-install-recommends \
+        dirmngr \
+        gnupg2 \
+        wget \
+        curl \
+        git \
+    && rm -rf /var/lib/apt/lists/*
+
+################################################################################
+# ROS Melodic
+################################################################################
+RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+RUN curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+
+#RUN apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+#RUN sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
+#RUN wget https://packages.osrfoundation.org/gazebo.key -O - | apt-key add -
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ros-melodic-desktop \
+        python-rosdep \
+        python-rosinstall \
+        python-rosinstall-generator \
+        python-wstool \
+        build-essential \
+        python3-pip \
+        python3-dev \
+        python3-numpy \
+        libboost-python1.65-dev \
+        libpcl-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+## Install gazebo9.19
+RUN sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
+RUN wget https://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
+RUN apt-get update && apt-get install -y gazebo9 libgazebo9 gazebo9-common
+## Download the .deb file required for Gazebo9:
+ARG TARGETARCH
+RUN wget http://packages.osrfoundation.org/gazebo/ubuntu-stable/pool/main/g/gazebo9/libgazebo9_9.19.0-1~bionic_${TARGETARCH}.deb \
+    && dpkg -i libgazebo9_9.19.0-1~bionic_${TARGETARCH}.deb \
+    && rm libgazebo9_9.19.0-1~bionic_${TARGETARCH}.deb
+
+## Install Gazebo development package:
+RUN apt-get -y install libgazebo9-dev
+# Add Gazebo's install directory to CMAKE_PREFIX_PATH:
+ENV CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:/usr/include/gazebo-9
+
+# Install gazebo_ros package:
+RUN apt-get -y install ros-melodic-gazebo-ros ros-melodic-gazebo-ros-pkgs
+
+# Add gazebo_ros's install directory to CMAKE_PREFIX_PATH:
+ENV CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:/opt/ros/melodic/share/gazebo_ros
+ENV GAZEBO_PLUGIN_PATH=$GAZEBO_PLUGIN_PATH:/opt/ros/melodic/lib
+
+RUN pip3 install setuptools wheel
+RUN pip3 install rospkg empy==3.3.4 watchdog smbus2 sensors.py pyyaml
+RUN echo export ROS_PYTHON_VERSION=3 >> /opt/ros/melodic/etc/catkin/profile.d/1.ros_python_version.sh
+RUN rosdep init
+
+################################################################################
+# ROS setup
+################################################################################
+ENV USER intball
+ENV HOME /home/$USER
+ENV SHELL /bin/bash
+ENV PASS ${USER}
+
+# add new sudo user
+RUN useradd -m $USER \
+    && gpasswd -a $USER sudo \
+    && echo "$USER:$USER" | chpasswd \
+    && echo "Defaults visiblepw" >> /etc/sudoers.d/$USER \
+    && echo "$USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/$USER
+
+USER $USER
+SHELL ["/bin/bash", "-c"]
+
+RUN rosdep update
+RUN echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc && \
+    echo "export ROS_MASTER_URI=\${ROS_MASTER_URI:-http://localhost:11311}" >> ~/.bashrc && \
+    echo "export ROS_HOSTNAME=\${ROS_HOSTNAME:-localhost}" >> ~/.bashrc && \
+    source ~/.bashrc
+
+################################################################################
+# For debug
+################################################################################
+USER root
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        vim \
+        tmux \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+################################################################################
+# Intball setup
+################################################################################
+ARG INTBALL2_SIMULATOR_REPO=https://github.com/jaxa/int-ball2_simulator.git
+ARG INTBALL2_SIMULATOR_REF=melodic
+
+USER $USER
+WORKDIR $HOME
+SHELL ["/bin/bash", "-c"]
+
+RUN mkdir -p $HOME/catkin_ws/src \
+    && git clone --depth 1 --branch ${INTBALL2_SIMULATOR_REF} ${INTBALL2_SIMULATOR_REPO} \
+    $HOME/catkin_ws/src_upstream
+COPY --chown=$USER:$USER docker/ros_overlay/src/ /home/$USER/catkin_ws/src/
+
+WORKDIR $HOME/catkin_ws
+RUN set -e; \
+    ln -sf /opt/ros/melodic/share/catkin/cmake/toplevel.cmake "$HOME/catkin_ws/src/CMakeLists.txt"; \
+        UPSTREAM_SRC="$HOME/catkin_ws/src_upstream/Int-Ball2_platform_simulator/src"; \
+        if [ -d "$UPSTREAM_SRC" ]; then \
+            mkdir -p "$HOME/catkin_ws/src"; \
+            for p in flight_software platform user; do \
+                rm -rf "$HOME/catkin_ws/src/$p"; \
+                ln -s ../src_upstream/Int-Ball2_platform_simulator/src/$p "$HOME/catkin_ws/src/$p"; \
+            done; \
+            mkdir -p "$HOME/catkin_ws/src/platform_sim"; \
+            for p in README.md description device doc ground platform_sim_tools simulation; do \
+                rm -rf "$HOME/catkin_ws/src/platform_sim/$p"; \
+                ln -s ../../src_upstream/Int-Ball2_platform_simulator/src/platform_sim/$p "$HOME/catkin_ws/src/platform_sim/$p"; \
+            done; \
+        fi
+COPY --chown=$USER:$USER docker/ros_overlay/src/platform_sim/description/urdf/iss.urdf /home/$USER/catkin_ws/src/platform_sim/description/urdf/iss.urdf
+COPY --chown=$USER:$USER docker/ros_overlay/src/platform_sim/simulation/ib2_gazebo/worlds/empty.world /home/$USER/catkin_ws/src/platform_sim/simulation/ib2_gazebo/worlds/empty.world
+COPY --chown=$USER:$USER docker/ros_overlay/src/platform_sim/simulation/ib2_gazebo/sim/sim.yaml /home/$USER/catkin_ws/src/platform_sim/simulation/ib2_gazebo/sim/sim.yaml
+RUN set -e; \
+        # Avoid duplicate package-name conflicts when local extension dirs coexist
+        # with upstream submodule packages.
+        if [ -d "$HOME/catkin_ws/src/flight_software/ib2_common/ib2_msgs" ] && [ -d "$HOME/catkin_ws/src/ib2_msgs" ]; then \
+            touch "$HOME/catkin_ws/src/ib2_msgs/CATKIN_IGNORE"; \
+        fi; \
+        if [ -d "$HOME/catkin_ws/src/user/sample_tests" ] && [ -d "$HOME/catkin_ws/src/platform_user/sample_tests" ]; then \
+            touch "$HOME/catkin_ws/src/platform_user/sample_tests/CATKIN_IGNORE"; \
+        fi; \
+        if [ -d "$HOME/catkin_ws/src/user/user_template" ] && [ -d "$HOME/catkin_ws/src/platform_user/user_template" ]; then \
+            touch "$HOME/catkin_ws/src/platform_user/user_template/CATKIN_IGNORE"; \
+        fi
+RUN source /opt/ros/melodic/setup.bash \
+    && catkin_make \
+        -DWITH_PCA9685=OFF \
+        -DCATKIN_BLACKLIST_PACKAGES="camera_and_microphone;led_display;audio_capture;gscam" \
+    && echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
+
+################################################################################
+# OpenCV 3.3.1 (+ contrib/ArUco) from source
+################################################################################
+ARG OPENCV_VERSION=3.3.1
+USER root
+RUN set -e; \
+    mkdir -p /opt/opencv-src && cd /opt/opencv-src; \
+    wget -q -O opencv.tar.gz https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.tar.gz; \
+    wget -q -O opencv_contrib.tar.gz https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.tar.gz; \
+    tar xzf opencv.tar.gz && tar xzf opencv_contrib.tar.gz && rm -f opencv.tar.gz opencv_contrib.tar.gz; \
+    mkdir -p build && cd build; \
+    cmake ../opencv-${OPENCV_VERSION} \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr/local \
+        -DOPENCV_EXTRA_MODULES_PATH=/opt/opencv-src/opencv_contrib-${OPENCV_VERSION}/modules \
+        -DBUILD_opencv_python2=OFF \
+        -DBUILD_opencv_python3=ON \
+        -DPYTHON3_EXECUTABLE=/usr/bin/python3 \
+        -DPYTHON3_INCLUDE_DIR=/usr/include/python3.6m \
+        -DPYTHON3_NUMPY_INCLUDE_DIRS=/usr/lib/python3/dist-packages/numpy/core/include \
+        -DPYTHON3_PACKAGES_PATH=/usr/local/lib/python3.6/dist-packages \
+        -DBUILD_opencv_cnn_3dobj=OFF \
+        -DBUILD_opencv_dnn_modern=OFF \
+        -DBUILD_opencv_sfm=OFF \
+        -DBUILD_opencv_hdf=OFF \
+        -DBUILD_opencv_cvv=OFF \
+        -DWITH_IPP=OFF \
+        -DWITH_CUDA=OFF \
+        -DWITH_FFMPEG=OFF \
+        -DWITH_QT=OFF \
+        -DBUILD_TESTS=OFF \
+        -DBUILD_PERF_TESTS=OFF \
+        -DBUILD_EXAMPLES=OFF \
+        -DBUILD_DOCS=OFF; \
+    make -j"$(nproc)"; \
+    make install; \
+    ldconfig; \
+    cd /opt/opencv-src && rm -rf build; \
+    python3 -c "import cv2, cv2.aruco; assert cv2.__version__ == '${OPENCV_VERSION}', cv2.__version__"
+# Make find_package(OpenCV) resolve to 3.3.1 instead of the apt-provided 3.2
+ENV OpenCV_DIR=/usr/local/share/OpenCV
+USER $USER
+
+################################################################################
+# Python 3 ROS overlay
+################################################################################
+COPY --chown=$USER:$USER docker/ros_python3_overlay/src/ /home/$USER/ros_python3_ws/src/
+
+WORKDIR $HOME/ros_python3_ws
+RUN set -e; \
+    ln -sf /opt/ros/melodic/share/catkin/cmake/toplevel.cmake "$HOME/ros_python3_ws/src/CMakeLists.txt"; \
+    touch "$HOME/ros_python3_ws/src/vision_opencv/opencv_tests/CATKIN_IGNORE"; \
+    source /opt/ros/melodic/setup.bash; \
+    source "$HOME/catkin_ws/devel/setup.bash"; \
+    catkin_make -DPYTHON_EXECUTABLE=/usr/bin/python3 -DOpenCV_DIR=/usr/local/share/OpenCV
+
+WORKDIR $HOME/catkin_ws
+
+################################################################################
+# KRPC setup
+################################################################################
+USER root
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        zip \
+        unzip \
+        python3-pip \
+        python3-numpy \
+        imagemagick \
+        psmisc \
+        ros-melodic-zbar-ros \
+        ros-melodic-jsk-rviz-plugins \
+        ros-melodic-image-transport-plugins \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install --upgrade pip
+RUN pip3 install qrcode pillow==5.4.1 jinja2 requests
+# For user programming
+RUN pip3 install scipy scikit-learn
+
+ENTRYPOINT []

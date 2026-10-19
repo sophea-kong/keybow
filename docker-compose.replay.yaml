@@ -1,0 +1,18 @@
+services:
+    krpc:
+        image: krpc/krpc-replay:latest
+        shm_size: '2gb'
+        ports:
+            - 80:80
+            - 5900:5900
+        volumes:
+            - ./share:/tmp/share
+        environment:
+            - USER=ubuntu
+            - RESOLUTION=${RESOLUTION:-1024x600}
+            - PLAY_RATE=${PLAY_RATE:-1}
+            - START_TIME=${START_TIME:-0}
+            - VNC_PASSWORD=${VNC_PASSWORD:-ubuntu}
+            - X11VNC_ARGS=${X11VNC_ARGS:--shared -xdamage -wait 20 -defer 20}
+        command:
+            bash -c "/startup.sh &> /tmp/vnc.log & /play.sh"

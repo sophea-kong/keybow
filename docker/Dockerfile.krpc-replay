@@ -1,0 +1,13 @@
+ARG BASE_IMAGE=krpc/intball-simulator
+FROM ${BASE_IMAGE}
+
+################################################################################
+# Replay setup
+################################################################################
+USER root
+COPY --chown=$USER:$USER rootfs/startup.sh /startup.sh
+COPY --chown=$USER:$USER rootfs/play.sh /play.sh
+COPY --chown=$USER:$USER rootfs/krpc /krpc
+COPY --chown=$USER:$USER docker/ros_overlay/src/platform_sim/krpc_description/description/media/ib2_iss/media/materials/textures/ /home/intball/catkin_ws/src/platform_sim/krpc_description/description/media/ib2_iss/media/materials/textures/
+
+ENTRYPOINT []

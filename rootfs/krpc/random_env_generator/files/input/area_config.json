@@ -1,0 +1,153 @@
+{
+  "SafeArea": {
+    "comment": "SafeArea",
+    "min": [0.2, -0.8, 0.0],
+    "max": [7.0, 0.85, 1.68]
+  },
+  "UrdfMarkers": [
+    {
+      "id": 1,
+      "visualName": "ARmarker1",
+      "comment": "SAIBO",
+      "position": [1.451, -1.001, 0.6806],
+      "quaternion": [-0.5, 0.5, 0.5, 0.5],
+      "score_bands": [
+        { "radius": 0.1, "level": 3 },
+        { "radius": 0.2, "level": 2 },
+        { "radius": 0.3, "level": 1 }
+      ]
+    },
+    {
+      "id": 2,
+      "visualName": "ARmarker2",
+      "comment": "RYUTAI",
+      "position": [2.973, -1.001, 0.7176],
+      "quaternion": [-0.5, 0.5, 0.5, 0.5],
+      "score_bands": [
+        { "radius": 0.1, "level": 3 },
+        { "radius": 0.2, "level": 2 },
+        { "radius": 0.3, "level": 1 }
+      ]
+    },
+    {
+      "id": 3,
+      "visualName": "ARmarker3",
+      "comment": "MSPR_1",
+      "position": [3.313, -1.001, 0.5226],
+      "quaternion": [-0.5, 0.5, 0.5, 0.5],
+      "score_bands": [
+        { "radius": 0.1, "level": 3 },
+        { "radius": 0.2, "level": 2 },
+        { "radius": 0.3, "level": 1 }
+      ]
+    },
+    {
+      "id": 4,
+      "visualName": "ARmarker4",
+      "comment": "MSPR_2",
+      "position": [4.181, -1.001, 0.5226],
+      "quaternion": [-0.5, 0.5, 0.5, 0.5],
+      "score_bands": [
+        { "radius": 0.1, "level": 3 },
+        { "radius": 0.2, "level": 2 },
+        { "radius": 0.3, "level": 1 }
+      ]
+    },
+    {
+      "id": 5,
+      "visualName": "ARmarker5",
+      "comment": "RMS_Console",
+      "position": [5.754, -1.001, 0.8376],
+      "quaternion": [-0.5, 0.5, 0.5, 0.5],
+      "score_bands": [
+        { "radius": 0.1, "level": 3 },
+        { "radius": 0.2, "level": 2 },
+        { "radius": 0.3, "level": 1 }
+      ]
+    },
+    {
+      "id": 6,
+      "visualName": "ARmarker6",
+      "comment": "EPS1",
+      "position": [1.895, -0.282, -0.2084],
+      "quaternion": [0.0, 0.0, 0.7071068, 0.7071068],
+      "score_bands": [
+        { "radius": 0.1, "level": 3 },
+        { "radius": 0.2, "level": 2 },
+        { "radius": 0.3, "level": 1 }
+      ]
+    },
+    {
+      "id": 7,
+      "visualName": "ARmarker7",
+      "comment": "MELFI1",
+      "position": [1.451, -1.001, 0.3716],
+      "quaternion": [-0.5, 0.5, 0.5, 0.5],
+      "score_bands": [
+        { "radius": 0.1, "level": 3 },
+        { "radius": 0.2, "level": 2 },
+        { "radius": 0.3, "level": 1 }
+      ]
+    },
+    {
+      "id": 8,
+      "visualName": "ARmarker8",
+      "comment": "EPS2_2",
+      "position": [4.779, 0.112, 1.8836],
+      "quaternion": [0.0, 1.0, 0.0, 0.0],
+      "score_bands": [
+        { "radius": 0.1, "level": 3 },
+        { "radius": 0.2, "level": 2 },
+        { "radius": 0.3, "level": 1 }
+      ]
+    },
+    {
+      "id": 9,
+      "visualName": "ARmarker9",
+      "comment": "EPS2_1",
+      "position": [2.066, 1.046, -0.0144],
+      "quaternion": [-0.5, 0.5, -0.5, -0.5],
+      "score_bands": [
+        { "radius": 0.1, "level": 3 },
+        { "radius": 0.2, "level": 2 },
+        { "radius": 0.3, "level": 1 }
+      ]
+    },
+    {
+      "id": 10,
+      "visualName": "ARmarker10",
+      "comment": "ECLSS_TCS2",
+      "position": [5.851, 0.01, 1.8836],
+      "quaternion": [0.0, 1.0, 0.0, 0.0],
+      "score_bands": [
+        { "radius": 0.1, "level": 3 },
+        { "radius": 0.2, "level": 2 },
+        { "radius": 0.3, "level": 1 }
+      ]
+    },
+    {
+      "id": 11,
+      "visualName": "ARmarker11",
+      "comment": "Airlock",
+      "position": [7.195, 0.363, 1.2296],
+      "quaternion": [-0.5, 0.5, 0.5, -0.5],
+      "score_bands": [
+        { "radius": 0.1, "level": 3 },
+        { "radius": 0.2, "level": 2 },
+        { "radius": 0.3, "level": 1 }
+      ]
+    },
+    {
+      "id": 12,
+      "visualName": "ARmarker12",
+      "comment": "Bay0_Closeout_Panel",
+      "position": [0.0, -0.059, -0.1024],
+      "quaternion": [-0.5, 0.5, -0.5, 0.5],
+      "score_bands": [
+        { "radius": 0.1, "level": 3 },
+        { "radius": 0.2, "level": 2 },
+        { "radius": 0.3, "level": 1 }
+      ]
+    }
+  ]
+}

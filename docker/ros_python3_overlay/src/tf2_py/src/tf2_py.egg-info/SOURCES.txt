@@ -1,0 +1,6 @@
+setup.py
+src/tf2_py/__init__.py
+src/tf2_py.egg-info/PKG-INFO
+src/tf2_py.egg-info/SOURCES.txt
+src/tf2_py.egg-info/dependency_links.txt
+src/tf2_py.egg-info/top_level.txt
